@@ -1,49 +1,17 @@
 #ifdef _cplusplus
 extern "C" {
-    #include <stdio.h>
-    #include <stdlib.h>
-    #include <string.h>
-    #include <time.h>
+    #include "Matrix.h"
 }
 #else
-    #include <stdio.h>
-    #include <stdlib.h>
-    #include <string.h>
-    #include <time.h>
+    #include "Matrix.h"
 #endif
-
-#define MATRIX_INITIALIZER(X, ROW, COLUMN)          \
-    do {                                            \
-        (X).row    = ROW;                           \
-        (X).column = COLUMN;                        \
-        (X).values = NULL;                          \
-        (X).New    = Matrix_Allocate;               \
-        (X).Delete = free;                          \
-                                                    \
-        (X).values = (X).New(ROW, COLUMN);          \
-    } while (0)
 
 #define LOG2(LENGTH) \
     (8 * sizeof(unsigned int) - Count_Leading_Zero((LENGTH)) - 1)
 
-typedef struct _Matrix {
-    int row;
-    int column;
-    int **values;
-    
-    int **(*New)(int row, int column);
-    void  (*Delete)(void *);
-} Matrix;
-
 int Count_Leading_Zero(unsigned int number);
 
-int **Matrix_Allocate(int, int);
-void  Matrix_Free(void *);
-
 Matrix *Strassen(Matrix *, Matrix *, Matrix *, int);
-Matrix *Matrix_Multiply(Matrix *, Matrix *, Matrix *);
-Matrix *Matrix_Addition(Matrix *, Matrix *, Matrix *);
-Matrix *Matrix_Subtract(Matrix *, Matrix *, Matrix *);
 
 int main(int argc, char *argv[])
 {
@@ -71,7 +39,8 @@ int main(int argc, char *argv[])
     srand((unsigned int) time(NULL));
     for (int i = 0; i < dimensions; i++) {
         for (int j = 0; j < dimensions; j++) {
-            matrixA.values[i][j] = matrixB.values[i][j] = rand() % 1000;
+            matrixA.values[i][j] = rand() % 1000;
+            matrixB.values[i][j] = rand() % 1000;
         }
     }
 
@@ -98,7 +67,7 @@ int main(int argc, char *argv[])
     printf("\nMatrix C:\n");
     for(int i = 0; i < dimensions; i++) {
         for (int j = 0; j < dimensions; j++) {
-            printf("%-10d ", matrixC.values[i][j]);
+            printf("%10d ", matrixC.values[i][j]);
         }
         printf("\n");
     }
@@ -208,53 +177,4 @@ Matrix *Strassen(Matrix *dest, Matrix *srcA, Matrix *srcB, int length)
     temp1.Delete(temp1.values); temp2.Delete(temp2.values);
 
     return dest;
-}
-
-Matrix *Matrix_Multiply(Matrix *res, Matrix *a, Matrix *b)
-{
-    int m1 = (a->values[0][0] + a->values[1][1]) * (b->values[0][0] + b->values[1][1]);
-    int m2 = (a->values[1][0] + a->values[1][1]) *  b->values[0][0];
-    int m3 = (b->values[0][1] - b->values[1][1]) *  a->values[0][0];
-    int m4 = (b->values[1][0] - b->values[0][0]) *  a->values[1][1];
-    int m5 = (a->values[0][0] + a->values[0][1]) *  b->values[1][1];
-    int m6 = (a->values[1][0] - a->values[0][0]) * (b->values[0][0] + b->values[0][1]);
-    int m7 = (a->values[0][1] - a->values[1][1]) * (b->values[1][0] + b->values[1][1]);
-
-    res->values[0][0] = m1 + m4 - m5 + m7;
-    res->values[0][1] = m3 + m5;
-    res->values[1][0] = m2 + m4;
-    res->values[1][1] = m1 - m2 + m3 + m6;
-  
-    return res;
-}
-
-Matrix *Matrix_Addition(Matrix *res, Matrix *a, Matrix *b)
-{
-    for (int i = 0; i < res->row; i++)
-        for (int j = 0; j < res->column; j++)
-            res->values[i][j] = a->values[i][j] + b->values[i][j];
-
-    return res;
-}
-
-Matrix *Matrix_Subtract(Matrix *res, Matrix *a, Matrix * b)
-{
-    for (int i = 0; i < res->row; i++)
-        for (int j = 0; j < res->column; j++)
-            res->values[i][j] = a->values[i][j] - b->values[i][j];
-
-    return res;
-}
-
-int **Matrix_Allocate(int row, int column)
-{
-    int **matrix = (int **) calloc(row + row * column, sizeof(**matrix));
-    int *matrixTemp = (int *) (matrix + row);
-
-    for (int i = 0; i < row; i++) {
-        matrix[i] = matrixTemp;
-        matrixTemp += column;
-    }
-
-    return matrix;
 }
