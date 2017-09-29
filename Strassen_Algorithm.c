@@ -3,11 +3,13 @@ extern "C" {
     #include <stdio.h>
     #include <stdlib.h>
     #include <string.h>
+    #include <time.h>
 }
 #else
     #include <stdio.h>
     #include <stdlib.h>
     #include <string.h>
+    #include <time.h>
 #endif
 
 #define MATRIX_INITIALIZER(X, ROW, COLUMN)          \
@@ -66,9 +68,10 @@ int main(int argc, char *argv[])
     matrixB.values = matrixB.New(matrixB.row, matrixB.column);
     matrixC.values = matrixC.New(matrixC.row, matrixC.column);
     
+    srand((unsigned int) time(NULL));
     for (int i = 0; i < dimensions; i++) {
         for (int j = 0; j < dimensions; j++) {
-            matrixA.values[i][j] = matrixB.values[i][j] = i * dimensions + j;
+            matrixA.values[i][j] = matrixB.values[i][j] = rand() % 1000;
         }
     }
 
@@ -95,7 +98,7 @@ int main(int argc, char *argv[])
     printf("\nMatrix C:\n");
     for(int i = 0; i < dimensions; i++) {
         for (int j = 0; j < dimensions; j++) {
-            printf("%5d ", matrixC.values[i][j]);
+            printf("%-10d ", matrixC.values[i][j]);
         }
         printf("\n");
     }
