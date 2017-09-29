@@ -10,8 +10,6 @@ extern "C" {
     #include <string.h>
 #endif
 
-#define MATRIX_LENGTH 8
-
 #define MATRIX_INITIALIZER(X, ROW, COLUMN)          \
     do {                                            \
         (X).row    = ROW;                           \
@@ -23,6 +21,9 @@ extern "C" {
         (X).values = (X).New(ROW, COLUMN);          \
     } while (0)
 
+#define LOG2(LENGTH) \
+    (8 * sizeof(unsigned int) - Count_Leading_Zero((LENGTH)) - 1)
+
 typedef struct _Matrix {
     int row;
     int column;
@@ -31,6 +32,8 @@ typedef struct _Matrix {
     int **(*New)(int row, int column);
     void  (*Delete)(void *);
 } Matrix;
+
+int Count_Leading_Zero(unsigned int number);
 
 int **Matrix_Allocate(int, int);
 void  Matrix_Free(void *);
@@ -42,17 +45,30 @@ Matrix *Matrix_Subtract(Matrix *, Matrix *, Matrix *);
 
 int main(int argc, char *argv[])
 {
-    Matrix matrixA = { .row = MATRIX_LENGTH, .column = MATRIX_LENGTH, .values = NULL, .New = Matrix_Allocate, .Delete = free };
-    Matrix matrixB = { .row = MATRIX_LENGTH, .column = MATRIX_LENGTH, .values = NULL, .New = Matrix_Allocate, .Delete = free };
-    Matrix matrixC = { .row = MATRIX_LENGTH, .column = MATRIX_LENGTH, .values = NULL, .New = Matrix_Allocate, .Delete = free };
+    int dimensions, matrix_length;
 
-    matrixA.values = matrixA.New(matrixA.row, matrixA.column);
+    printf("Please enter the dimensions of the matrix: ");
+    scanf("%d", &dimensions);
+
+    if (dimensions <= 0) { printf("The number you entered is invalid."); exit(1); }
+
+    /* Check if dimensions of matrix is the power of two or not */
+    if (dimensions & (dimensions - 1))
+        matrix_length = 2 << LOG2((unsigned int) dimensions);
+    else
+        matrix_length = dimensions;
+
+    Matrix matrixA = { .row = matrix_length, .column = matrix_length, .values = NULL, .New = Matrix_Allocate, .Delete = free };
+    Matrix matrixB = { .row = matrix_length, .column = matrix_length, .values = NULL, .New = Matrix_Allocate, .Delete = free };
+    Matrix matrixC = { .row = matrix_length, .column = matrix_length, .values = NULL, .New = Matrix_Allocate, .Delete = free };
+
+    matrixA.values = matrixA.New(matrixA.row, matrixB.column);
     matrixB.values = matrixB.New(matrixB.row, matrixB.column);
     matrixC.values = matrixC.New(matrixC.row, matrixC.column);
     
-    for (int i = 0; i < matrixA.row; i++) {
-        for (int j = 0; j < matrixA.column; j++) {
-            matrixA.values[i][j] = matrixB.values[i][j] = i * matrixA.row + j;
+    for (int i = 0; i < dimensions; i++) {
+        for (int j = 0; j < dimensions; j++) {
+            matrixA.values[i][j] = matrixB.values[i][j] = i * dimensions + j;
         }
     }
 
@@ -61,24 +77,24 @@ int main(int argc, char *argv[])
 
     /* Print the answer of matrix multiplication */
     printf("Matrix A:\n");
-    for(int i = 0; i < matrixA.row; i++) {
-        for (int j = 0; j < matrixA.column; j++) {
+    for(int i = 0; i < dimensions; i++) {
+        for (int j = 0; j < dimensions; j++) {
             printf("%5d ", matrixA.values[i][j]);
         }
         printf("\n");
     }
 
     printf("\nMatrix B:\n");
-    for(int i = 0; i < matrixB.row; i++) {
-        for (int j = 0; j < matrixB.column; j++) {
+    for(int i = 0; i < dimensions; i++) {
+        for (int j = 0; j < dimensions; j++) {
             printf("%5d ", matrixB.values[i][j]);
         }
         printf("\n");
     }
 
     printf("\nMatrix C:\n");
-    for(int i = 0; i < matrixC.row; i++) {
-        for (int j = 0; j < matrixC.column; j++) {
+    for(int i = 0; i < dimensions; i++) {
+        for (int j = 0; j < dimensions; j++) {
             printf("%5d ", matrixC.values[i][j]);
         }
         printf("\n");
@@ -86,9 +102,23 @@ int main(int argc, char *argv[])
 
     matrixA.Delete(matrixA.values);
     matrixB.Delete(matrixB.values);
-    matrixC.Delete(matrixC.values);    
+    matrixC.Delete(matrixC.values);
 
     return 0;
+}
+
+int Count_Leading_Zero(unsigned int number)
+{
+    if (number == 0) return 32;
+    
+    int count = 0;
+    if (number <= 0x0000FFFF) { count += 16; number <<= 16; }
+    if (number <= 0x00FFFFFF) { count +=  8; number <<=  8; }
+    if (number <= 0x0FFFFFFF) { count +=  4; number <<=  4; }
+    if (number <= 0x3FFFFFFF) { count +=  2; number <<=  2; }
+    if (number <= 0x7FFFFFFF) { count +=  1; number <<=  1; }
+
+    return count;
 }
 
 Matrix *Strassen(Matrix *dest, Matrix *srcA, Matrix *srcB, int length)
@@ -215,7 +245,7 @@ Matrix *Matrix_Subtract(Matrix *res, Matrix *a, Matrix * b)
 
 int **Matrix_Allocate(int row, int column)
 {
-    int **matrix = (int **) malloc(row * sizeof(*matrix) + row * column * sizeof(**matrix));
+    int **matrix = (int **) calloc(row + row * column, sizeof(**matrix));
     int *matrixTemp = (int *) (matrix + row);
 
     for (int i = 0; i < row; i++) {
