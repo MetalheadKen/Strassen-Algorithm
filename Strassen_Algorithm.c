@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
     if (dimensions <= 0) { printf("The number you entered is invalid."); exit(1); }
 
     /* Check if dimensions of matrix is the power of two or not */
-    if (dimensions & (dimensions - 1))
+    if ((dimensions & (dimensions - 1)) || (dimensions == 1))
         matrix_length = 2 << LOG2((unsigned int) dimensions);
     else
         matrix_length = dimensions;
