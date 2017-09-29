@@ -1,6 +1,6 @@
 # Strassen Algorithm
 
-Implementation of the Strassen Alogrithm in C
+Implementation of the Strassen Algorithm in C
 
         The Strassen algorithm, is an algorithm for matrix multiplication. It is faster
         than the standard matrix multiplication algorithm, but would be slower than the
