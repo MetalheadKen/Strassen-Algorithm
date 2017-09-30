@@ -1,8 +1,10 @@
 #ifdef _cplusplus
 extern "C" {
+    #include <time.h>
     #include "Matrix.h"
 }
 #else
+    #include <time.h>
     #include "Matrix.h"
 #endif
 
