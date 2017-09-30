@@ -11,7 +11,7 @@ extern "C" {
 
 int Count_Leading_Zero(unsigned int number);
 
-Matrix *Strassen(Matrix *, const Matrix *, const Matrix *, int);
+Matrix Strassen(Matrix, const Matrix, const Matrix, int);
 
 int main(int argc, char *argv[])
 {
@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
     }
 
     /* Matrix multiplication */
-    Strassen(&matrixC, &matrixA, &matrixB, matrixC.row);
+    Strassen(matrixC, matrixA, matrixB, matrixC.row);
 
     /* Print the answer of matrix multiplication */
     printf("Matrix A:\n");
@@ -93,7 +93,7 @@ int Count_Leading_Zero(unsigned int number)
     return count;
 }
 
-Matrix *Strassen(Matrix *dest, const Matrix *srcA, const Matrix *srcB, int length)
+Matrix Strassen(Matrix dest, const Matrix srcA, const Matrix srcB, int length)
 {
     if (length == 2) return Matrix_Multiply(dest, srcA, srcB);
 
@@ -131,41 +131,41 @@ Matrix *Strassen(Matrix *dest, const Matrix *srcA, const Matrix *srcB, int lengt
     /* Divide matrix to four part */
     for (int i = 0; i < len; i++) {
         for (int j = 0; j < len; j++) {
-            a11.values[i][j] = srcA->values[i][j];
-            a12.values[i][j] = srcA->values[i][j + len];
-            a21.values[i][j] = srcA->values[i + len][j];
-            a22.values[i][j] = srcA->values[i + len][j + len];
+            a11.values[i][j] = srcA.values[i][j];
+            a12.values[i][j] = srcA.values[i][j + len];
+            a21.values[i][j] = srcA.values[i + len][j];
+            a22.values[i][j] = srcA.values[i + len][j + len];
             
-            b11.values[i][j] = srcB->values[i][j];
-            b12.values[i][j] = srcB->values[i][j + len];
-            b21.values[i][j] = srcB->values[i + len][j];
-            b22.values[i][j] = srcB->values[i + len][j + len];
+            b11.values[i][j] = srcB.values[i][j];
+            b12.values[i][j] = srcB.values[i][j + len];
+            b21.values[i][j] = srcB.values[i + len][j];
+            b22.values[i][j] = srcB.values[i + len][j + len];
         }
     }
 
     /* Calculate seven formulas of Strassen Algorithm */
-    Strassen(&m1, Matrix_Addition(&temp1, &a11, &a22), Matrix_Addition(&temp2, &b11, &b22), len);
-    Strassen(&m2, Matrix_Addition(&temp1, &a21, &a22), &b11, len);
-    Strassen(&m3, &a11, Matrix_Subtract(&temp1, &b12, &b22), len);
-    Strassen(&m4, &a22, Matrix_Subtract(&temp1, &b21, &b11), len);
-    Strassen(&m5, Matrix_Addition(&temp1, &a11, &a12), &b22, len);
-    Strassen(&m6, Matrix_Subtract(&temp1, &a21, &a11), Matrix_Addition(&temp2, &b11, &b12), len);
-    Strassen(&m7, Matrix_Subtract(&temp1, &a12, &a22), Matrix_Addition(&temp2, &b21, &b22), len);
+    Strassen(m1, Matrix_Addition(temp1, a11, a22), Matrix_Addition(temp2, b11, b22), len);
+    Strassen(m2, Matrix_Addition(temp1, a21, a22), b11, len);
+    Strassen(m3, a11, Matrix_Subtract(temp1, b12, b22), len);
+    Strassen(m4, a22, Matrix_Subtract(temp1, b21, b11), len);
+    Strassen(m5, Matrix_Addition(temp1, a11, a12), b22, len);
+    Strassen(m6, Matrix_Subtract(temp1, a21, a11), Matrix_Addition(temp2, b11, b12), len);
+    Strassen(m7, Matrix_Subtract(temp1, a12, a22), Matrix_Addition(temp2, b21, b22), len);
 
     /* Merge the answer of matrix dest */
     /* c11 = m1 + m4 - m5 + m7 = m1 + m4 - (m5 - m7) */
-    Matrix_Subtract(&c11, Matrix_Addition(&temp1, &m1, &m4), Matrix_Subtract(&temp2, &m5, &m7));
-    Matrix_Addition(&c12, &m3, &m5);
-    Matrix_Addition(&c21, &m2, &m4);
-    Matrix_Addition(&c22, Matrix_Subtract(&temp1, &m1, &m2), Matrix_Addition(&temp2, &m3, &m6));
+    Matrix_Subtract(c11, Matrix_Addition(temp1, m1, m4), Matrix_Subtract(temp2, m5, m7));
+    Matrix_Addition(c12, m3, m5);
+    Matrix_Addition(c21, m2, m4);
+    Matrix_Addition(c22, Matrix_Subtract(temp1, m1, m2), Matrix_Addition(temp2, m3, m6));
     
     /* Store the answer of matrix multiplication */
     for (int i = 0; i < len; i++) {
         for (int j = 0; j < len; j++) {
-            dest->values[i][j]              = c11.values[i][j];
-            dest->values[i][j + len]        = c12.values[i][j];
-            dest->values[i + len][j]        = c21.values[i][j];
-            dest->values[i + len][j + len]  = c22.values[i][j];
+            dest.values[i][j]              = c11.values[i][j];
+            dest.values[i][j + len]        = c12.values[i][j];
+            dest.values[i + len][j]        = c21.values[i][j];
+            dest.values[i + len][j + len]  = c22.values[i][j];
         }
     }
 

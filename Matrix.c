@@ -13,38 +13,38 @@ int **Matrix_Allocate(int row, int column)
     return matrix;
 }
 
-Matrix *Matrix_Addition(Matrix *res, const Matrix *a, const Matrix *b)
+Matrix Matrix_Addition(Matrix res, const Matrix a, const Matrix b)
 {
-    for (int i = 0; i < res->row; i++)
-        for (int j = 0; j < res->column; j++)
-            res->values[i][j] = a->values[i][j] + b->values[i][j];
+    for (int i = 0; i < res.row; i++)
+        for (int j = 0; j < res.column; j++)
+            res.values[i][j] = a.values[i][j] + b.values[i][j];
 
     return res;
 }
 
-Matrix *Matrix_Subtract(Matrix *res, const Matrix *a, const Matrix * b)
+Matrix Matrix_Subtract(Matrix res, const Matrix a, const Matrix b)
 {
-    for (int i = 0; i < res->row; i++)
-        for (int j = 0; j < res->column; j++)
-            res->values[i][j] = a->values[i][j] - b->values[i][j];
+    for (int i = 0; i < res.row; i++)
+        for (int j = 0; j < res.column; j++)
+            res.values[i][j] = a.values[i][j] - b.values[i][j];
 
     return res;
 }
 
-Matrix *Matrix_Multiply(Matrix *res, const Matrix *a, const Matrix *b)
+Matrix Matrix_Multiply(Matrix res, const Matrix a, const Matrix b)
 {
-    int m1 = (a->values[0][0] + a->values[1][1]) * (b->values[0][0] + b->values[1][1]);
-    int m2 = (a->values[1][0] + a->values[1][1]) *  b->values[0][0];
-    int m3 = (b->values[0][1] - b->values[1][1]) *  a->values[0][0];
-    int m4 = (b->values[1][0] - b->values[0][0]) *  a->values[1][1];
-    int m5 = (a->values[0][0] + a->values[0][1]) *  b->values[1][1];
-    int m6 = (a->values[1][0] - a->values[0][0]) * (b->values[0][0] + b->values[0][1]);
-    int m7 = (a->values[0][1] - a->values[1][1]) * (b->values[1][0] + b->values[1][1]);
+    int m1 = (a.values[0][0] + a.values[1][1]) * (b.values[0][0] + b.values[1][1]);
+    int m2 = (a.values[1][0] + a.values[1][1]) *  b.values[0][0];
+    int m3 = (b.values[0][1] - b.values[1][1]) *  a.values[0][0];
+    int m4 = (b.values[1][0] - b.values[0][0]) *  a.values[1][1];
+    int m5 = (a.values[0][0] + a.values[0][1]) *  b.values[1][1];
+    int m6 = (a.values[1][0] - a.values[0][0]) * (b.values[0][0] + b.values[0][1]);
+    int m7 = (a.values[0][1] - a.values[1][1]) * (b.values[1][0] + b.values[1][1]);
 
-    res->values[0][0] = m1 + m4 - m5 + m7;
-    res->values[0][1] = m3 + m5;
-    res->values[1][0] = m2 + m4;
-    res->values[1][1] = m1 - m2 + m3 + m6;
+    res.values[0][0] = m1 + m4 - m5 + m7;
+    res.values[0][1] = m3 + m5;
+    res.values[1][0] = m2 + m4;
+    res.values[1][1] = m1 - m2 + m3 + m6;
   
     return res;
 }
