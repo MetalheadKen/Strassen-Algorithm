@@ -11,7 +11,7 @@ extern "C" {
 
 int Count_Leading_Zero(unsigned int number);
 
-Matrix *Strassen(Matrix *, Matrix *, Matrix *, int);
+Matrix *Strassen(Matrix *, const Matrix *, const Matrix *, int);
 
 int main(int argc, char *argv[])
 {
@@ -93,7 +93,7 @@ int Count_Leading_Zero(unsigned int number)
     return count;
 }
 
-Matrix *Strassen(Matrix *dest, Matrix *srcA, Matrix *srcB, int length)
+Matrix *Strassen(Matrix *dest, const Matrix *srcA, const Matrix *srcB, int length)
 {
     if (length == 2) return Matrix_Multiply(dest, srcA, srcB);
 

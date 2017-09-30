@@ -29,8 +29,8 @@ typedef struct _Matrix {
 int **Matrix_Allocate(int, int);
 void  Matrix_Free(void *);
 
-Matrix *Matrix_Addition(Matrix *, Matrix *, Matrix *);
-Matrix *Matrix_Subtract(Matrix *, Matrix *, Matrix *);
-Matrix *Matrix_Multiply(Matrix *, Matrix *, Matrix *);
+Matrix *Matrix_Addition(Matrix *, const Matrix *, const Matrix *);
+Matrix *Matrix_Subtract(Matrix *, const Matrix *, const Matrix *);
+Matrix *Matrix_Multiply(Matrix *, const Matrix *, const Matrix *);
 
 #endif /* MATRIX_H_ */

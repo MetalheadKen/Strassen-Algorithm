@@ -13,7 +13,7 @@ int **Matrix_Allocate(int row, int column)
     return matrix;
 }
 
-Matrix *Matrix_Addition(Matrix *res, Matrix *a, Matrix *b)
+Matrix *Matrix_Addition(Matrix *res, const Matrix *a, const Matrix *b)
 {
     for (int i = 0; i < res->row; i++)
         for (int j = 0; j < res->column; j++)
@@ -22,7 +22,7 @@ Matrix *Matrix_Addition(Matrix *res, Matrix *a, Matrix *b)
     return res;
 }
 
-Matrix *Matrix_Subtract(Matrix *res, Matrix *a, Matrix * b)
+Matrix *Matrix_Subtract(Matrix *res, const Matrix *a, const Matrix * b)
 {
     for (int i = 0; i < res->row; i++)
         for (int j = 0; j < res->column; j++)
@@ -31,7 +31,7 @@ Matrix *Matrix_Subtract(Matrix *res, Matrix *a, Matrix * b)
     return res;
 }
 
-Matrix *Matrix_Multiply(Matrix *res, Matrix *a, Matrix *b)
+Matrix *Matrix_Multiply(Matrix *res, const Matrix *a, const Matrix *b)
 {
     int m1 = (a->values[0][0] + a->values[1][1]) * (b->values[0][0] + b->values[1][1]);
     int m2 = (a->values[1][0] + a->values[1][1]) *  b->values[0][0];
