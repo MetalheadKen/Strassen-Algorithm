@@ -1,34 +1,28 @@
 #ifndef MATRIX_H_
 #define MATRIX_H_
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <stdint.h>
 
-#define MATRIX_INITIALIZER(X, ROW, COLUMN)          \
-    do {                                            \
-        (X).row    = ROW;                           \
-        (X).column = COLUMN;                        \
-        (X).values = NULL;                          \
-        (X).New    = Matrix_Allocate;               \
-        (X).Delete = free;                          \
-                                                    \
-        (X).values = (X).New(ROW, COLUMN);          \
-    } while (0)
+#define MATRIX_INITIALIZER(X, ROW, COLUMN) \
+        Matrix_Initializer(&(X) ,(ROW), (COLUMN));
 
 typedef struct _Matrix {
-    int row;
-    int column;
+    uint32_t row;
+    uint32_t column;
     int **values;
     
-    int **(*New)(int row, int column);
+    int **(*New)(uint32_t row, uint32_t column);
     void  (*Delete)(void *);
 } Matrix;
 
-int **Matrix_Allocate(int, int);
-void  Matrix_Free(void *);
+typedef struct _Matrix_Arith {
+    Matrix (*Addition)(Matrix, const Matrix, const Matrix);
+    Matrix (*Subtract)(Matrix, const Matrix, const Matrix);
+    Matrix (*Multiply)(Matrix, const Matrix, const Matrix);
+} Matrix_Arith;
 
-Matrix Matrix_Addition(Matrix, const Matrix, const Matrix);
-Matrix Matrix_Subtract(Matrix, const Matrix, const Matrix);
-Matrix Matrix_Multiply(Matrix, const Matrix, const Matrix);
+void Matrix_Initializer(Matrix *, uint32_t, uint32_t);
+
+extern Matrix_Arith Naive_Matrix_Arith;
 
 #endif /* MATRIX_H_ */

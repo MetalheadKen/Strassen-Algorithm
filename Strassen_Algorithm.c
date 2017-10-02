@@ -1,9 +1,13 @@
 #ifdef _cplusplus
 extern "C" {
+    #include <stdio.h>
+    #include <stdlib.h>
     #include <time.h>
     #include "Matrix.h"
 }
 #else
+    #include <stdio.h>
+    #include <stdlib.h>
     #include <time.h>
     #include "Matrix.h"
 #endif
@@ -14,6 +18,10 @@ extern "C" {
 int Count_Leading_Zero(unsigned int number);
 
 Matrix Strassen(Matrix, const Matrix, const Matrix, int);
+
+Matrix_Arith *matrix_arith_providers[] = {
+    &Naive_Matrix_Arith,
+};
 
 int main(int argc, char *argv[])
 {
@@ -30,13 +38,11 @@ int main(int argc, char *argv[])
     else
         matrix_length = dimensions;
 
-    Matrix matrixA = { .row = matrix_length, .column = matrix_length, .values = NULL, .New = Matrix_Allocate, .Delete = free };
-    Matrix matrixB = { .row = matrix_length, .column = matrix_length, .values = NULL, .New = Matrix_Allocate, .Delete = free };
-    Matrix matrixC = { .row = matrix_length, .column = matrix_length, .values = NULL, .New = Matrix_Allocate, .Delete = free };
+    Matrix matrixA, matrixB, matrixC;
 
-    matrixA.values = matrixA.New(matrixA.row, matrixB.column);
-    matrixB.values = matrixB.New(matrixB.row, matrixB.column);
-    matrixC.values = matrixC.New(matrixC.row, matrixC.column);
+    MATRIX_INITIALIZER(matrixA, matrix_length, matrix_length);
+    MATRIX_INITIALIZER(matrixB, matrix_length, matrix_length);
+    MATRIX_INITIALIZER(matrixC, matrix_length, matrix_length);
     
     srand((unsigned int) time(NULL));
     for (int i = 0; i < dimensions; i++) {
@@ -97,7 +103,9 @@ int Count_Leading_Zero(unsigned int number)
 
 Matrix Strassen(Matrix dest, const Matrix srcA, const Matrix srcB, int length)
 {
-    if (length == 2) return Matrix_Multiply(dest, srcA, srcB);
+    Matrix_Arith *arith = matrix_arith_providers[0];
+    
+    if (length == 2) return arith->Multiply(dest, srcA, srcB);
 
     int len = length / 2;
 
@@ -108,27 +116,12 @@ Matrix Strassen(Matrix dest, const Matrix srcA, const Matrix srcB, int length)
            temp1, temp2;
 
     /* Initializer the matrix */
-    MATRIX_INITIALIZER(a11, len, len);
-    MATRIX_INITIALIZER(a12, len, len);
-    MATRIX_INITIALIZER(a21, len, len);
-    MATRIX_INITIALIZER(a22, len, len);
-    MATRIX_INITIALIZER(b11, len, len);
-    MATRIX_INITIALIZER(b12, len, len);
-    MATRIX_INITIALIZER(b21, len, len);
-    MATRIX_INITIALIZER(b22, len, len);
-    MATRIX_INITIALIZER(c11, len, len);
-    MATRIX_INITIALIZER(c12, len, len);
-    MATRIX_INITIALIZER(c21, len, len);
-    MATRIX_INITIALIZER(c22, len, len);
-    MATRIX_INITIALIZER(m1, len, len);
-    MATRIX_INITIALIZER(m2, len, len);
-    MATRIX_INITIALIZER(m3, len, len);
-    MATRIX_INITIALIZER(m4, len, len);
-    MATRIX_INITIALIZER(m5, len, len);
-    MATRIX_INITIALIZER(m6, len, len);
-    MATRIX_INITIALIZER(m7, len, len);
-    MATRIX_INITIALIZER(temp1, len, len);
-    MATRIX_INITIALIZER(temp2, len, len);
+    MATRIX_INITIALIZER(a11, len, len); MATRIX_INITIALIZER(a12, len, len); MATRIX_INITIALIZER(a21, len, len); MATRIX_INITIALIZER(a22, len, len);
+    MATRIX_INITIALIZER(b11, len, len); MATRIX_INITIALIZER(b12, len, len); MATRIX_INITIALIZER(b21, len, len); MATRIX_INITIALIZER(b22, len, len);
+    MATRIX_INITIALIZER(c11, len, len); MATRIX_INITIALIZER(c12, len, len); MATRIX_INITIALIZER(c21, len, len); MATRIX_INITIALIZER(c22, len, len);
+    MATRIX_INITIALIZER(m1, len, len);  MATRIX_INITIALIZER(m2, len, len);  MATRIX_INITIALIZER(m3, len, len);  MATRIX_INITIALIZER(m4, len, len);
+    MATRIX_INITIALIZER(m5, len, len);  MATRIX_INITIALIZER(m6, len, len);  MATRIX_INITIALIZER(m7, len, len);
+    MATRIX_INITIALIZER(temp1, len, len); MATRIX_INITIALIZER(temp2, len, len);
 
     /* Divide matrix to four part */
     for (int i = 0; i < len; i++) {
@@ -146,20 +139,20 @@ Matrix Strassen(Matrix dest, const Matrix srcA, const Matrix srcB, int length)
     }
 
     /* Calculate seven formulas of Strassen Algorithm */
-    Strassen(m1, Matrix_Addition(temp1, a11, a22), Matrix_Addition(temp2, b11, b22), len);
-    Strassen(m2, Matrix_Addition(temp1, a21, a22), b11, len);
-    Strassen(m3, a11, Matrix_Subtract(temp1, b12, b22), len);
-    Strassen(m4, a22, Matrix_Subtract(temp1, b21, b11), len);
-    Strassen(m5, Matrix_Addition(temp1, a11, a12), b22, len);
-    Strassen(m6, Matrix_Subtract(temp1, a21, a11), Matrix_Addition(temp2, b11, b12), len);
-    Strassen(m7, Matrix_Subtract(temp1, a12, a22), Matrix_Addition(temp2, b21, b22), len);
+    Strassen(m1, arith->Addition(temp1, a11, a22), arith->Addition(temp2, b11, b22), len);
+    Strassen(m2, arith->Addition(temp1, a21, a22), b11, len);
+    Strassen(m3, a11, arith->Subtract(temp1, b12, b22), len);
+    Strassen(m4, a22, arith->Subtract(temp1, b21, b11), len);
+    Strassen(m5, arith->Addition(temp1, a11, a12), b22, len);
+    Strassen(m6, arith->Subtract(temp1, a21, a11), arith->Addition(temp2, b11, b12), len);
+    Strassen(m7, arith->Subtract(temp1, a12, a22), arith->Addition(temp2, b21, b22), len);
 
     /* Merge the answer of matrix dest */
     /* c11 = m1 + m4 - m5 + m7 = m1 + m4 - (m5 - m7) */
-    Matrix_Subtract(c11, Matrix_Addition(temp1, m1, m4), Matrix_Subtract(temp2, m5, m7));
-    Matrix_Addition(c12, m3, m5);
-    Matrix_Addition(c21, m2, m4);
-    Matrix_Addition(c22, Matrix_Subtract(temp1, m1, m2), Matrix_Addition(temp2, m3, m6));
+    arith->Subtract(c11, arith->Addition(temp1, m1, m4), arith->Subtract(temp2, m5, m7));
+    arith->Addition(c12, m3, m5);
+    arith->Addition(c21, m2, m4);
+    arith->Addition(c22, arith->Subtract(temp1, m1, m2), arith->Addition(temp2, m3, m6));
     
     /* Store the answer of matrix multiplication */
     for (int i = 0; i < len; i++) {
