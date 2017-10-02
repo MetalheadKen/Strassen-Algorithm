@@ -61,7 +61,7 @@ void Matrix_Initializer(Matrix *matrix, uint32_t row, uint32_t column)
     matrix->values = matrix->New(row, column);
 }
 
-Matrix_Arith Naive_Matrix_Arith = {
+Matrix_Arith Naive_Matrix_Arith __attribute__((section("Matrix_Arith"))) = {
     .Addition = Matrix_Addition,
     .Subtract = Matrix_Subtract,
     .Multiply = Matrix_Multiply,

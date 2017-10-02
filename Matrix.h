@@ -3,6 +3,9 @@
 
 #include <stdint.h>
 
+#define MATRIX_ARITH_BEGIN __start_Matrix_Arith
+#define MATRIX_ARITH_END   __stop_Matrix_Arith
+
 #define MATRIX_INITIALIZER(X, ROW, COLUMN) \
         Matrix_Initializer(&(X) ,(ROW), (COLUMN));
 
@@ -26,5 +29,8 @@ typedef struct _Matrix_Arith {
 void Matrix_Initializer(Matrix *, uint32_t, uint32_t);
 
 extern Matrix_Arith Naive_Matrix_Arith;
+
+extern Matrix_Arith __start_Matrix_Arith[];
+extern Matrix_Arith __stop_Matrix_Arith[];
 
 #endif /* MATRIX_H_ */

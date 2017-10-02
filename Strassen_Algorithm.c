@@ -19,10 +19,6 @@ int Count_Leading_Zero(unsigned int number);
 
 Matrix Strassen(Matrix, const Matrix, const Matrix, int);
 
-Matrix_Arith *matrix_arith_providers[] = {
-    &Naive_Matrix_Arith,
-};
-
 int main(int argc, char *argv[])
 {
     int dimensions, matrix_length;
@@ -103,7 +99,7 @@ int Count_Leading_Zero(unsigned int number)
 
 Matrix Strassen(Matrix dest, const Matrix srcA, const Matrix srcB, int length)
 {
-    Matrix_Arith *arith = matrix_arith_providers[NAIVE_ARITHMETIC];
+    Matrix_Arith *arith = &__start_Matrix_Arith[NAIVE_ARITHMETIC];
     
     if (length == 2) return arith->Multiply(dest, srcA, srcB);
 
