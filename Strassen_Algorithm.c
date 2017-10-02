@@ -103,7 +103,7 @@ int Count_Leading_Zero(unsigned int number)
 
 Matrix Strassen(Matrix dest, const Matrix srcA, const Matrix srcB, int length)
 {
-    Matrix_Arith *arith = matrix_arith_providers[0];
+    Matrix_Arith *arith = matrix_arith_providers[NAIVE_ARITHMETIC];
     
     if (length == 2) return arith->Multiply(dest, srcA, srcB);
 

@@ -6,6 +6,8 @@
 #define MATRIX_INITIALIZER(X, ROW, COLUMN) \
         Matrix_Initializer(&(X) ,(ROW), (COLUMN));
 
+enum { NAIVE_ARITHMETIC, };
+
 typedef struct _Matrix {
     uint32_t row;
     uint32_t column;
