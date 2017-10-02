@@ -105,11 +105,11 @@ Matrix Strassen(Matrix dest, const Matrix srcA, const Matrix srcB, int length)
 
     int len = length / 2;
 
-    Matrix a11, a12, a21, a22,              /* Matrix srcA divide four part */
-           b11, b12, b21, b22,              /* Matrix srcB divide four part */
-           c11, c12, c21, c22,              /* Matrix dest divide four part */
-           m1, m2, m3, m4, m5, m6, m7,
-           temp1, temp2;
+    autofree Matrix a11, a12, a21, a22,              /* Matrix srcA divide four part */
+                    b11, b12, b21, b22,              /* Matrix srcB divide four part */
+                    c11, c12, c21, c22,              /* Matrix dest divide four part */
+                    m1, m2, m3, m4, m5, m6, m7,
+                    temp1, temp2;
 
     /* Initializer the matrix */
     MATRIX_INITIALIZER(a11, len, len); MATRIX_INITIALIZER(a12, len, len); MATRIX_INITIALIZER(a21, len, len); MATRIX_INITIALIZER(a22, len, len);
@@ -159,13 +159,6 @@ Matrix Strassen(Matrix dest, const Matrix srcA, const Matrix srcB, int length)
             dest.values[i + len][j + len]  = c22.values[i][j];
         }
     }
-
-    a11.Delete(a11.values); a12.Delete(a12.values); a21.Delete(a21.values); a22.Delete(a22.values);
-    b11.Delete(b11.values); b12.Delete(b12.values); b21.Delete(b21.values); b22.Delete(b22.values);
-    c11.Delete(c11.values); c12.Delete(c12.values); c21.Delete(c21.values); c22.Delete(c22.values);
-    m1.Delete(m1.values);   m2.Delete(m2.values);   m3.Delete(m3.values);   m4.Delete(m4.values);
-    m5.Delete(m5.values);   m6.Delete(m6.values);   m7.Delete(m7.values);
-    temp1.Delete(temp1.values); temp2.Delete(temp2.values);
 
     return dest;
 }

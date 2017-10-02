@@ -14,6 +14,13 @@ static int **Matrix_Allocate(uint32_t row, uint32_t column)
     return matrix;
 }
 
+__attribute__((always_inline)) 
+inline void Matrix_Free(void *ptr)
+{
+    Matrix *matrix = (Matrix *) ptr;
+    return free(matrix->values);
+}
+
 static Matrix Matrix_Addition(Matrix res, const Matrix a, const Matrix b)
 {
     for (uint32_t i = 0; i < res.row; i++)
