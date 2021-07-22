@@ -1,4 +1,13 @@
-# Strassen Algorithm
+# 100% REFACTORED 
+
+Unfortunately Strassen as coded here is not working. 
+
+Refactoring (c) 20201 by dbj@dbj.org -- https://dbj.org/license_dbj 
+---
+
+Original README
+
+### Strassen Algorithm
 
 Implementation of the Strassen Algorithm in C
 
