@@ -1,17 +1,20 @@
 <h1>100%</h1>
-<h2>&nbsp;</h2>
 
 #### REFACTORED SIMPLE, CORRECT AND WORKING
 
-<h2>&nbsp;</h2>
-
+&nbsp; 
+&nbsp; 
 > Refactoring (c) 2021 by dbj@dbj.org -- https://dbj.org/license_dbj 
-
-<h2>&nbsp;</h2>
+&nbsp; 
+&nbsp; 
 
 Original README
+&nbsp; 
+&nbsp; 
 
 ### Strassen Algorithm
+&nbsp; 
+&nbsp; 
 
 Implementation of the Strassen Algorithm in C
 
