@@ -3,7 +3,7 @@
 Refactoring (c) 2021 by dbj@dbj.org -- https://dbj.org/license_dbj 
 ```
 
-Built on WIN10 using `TDM-GCC-64`. Clang or GCC are required.
+Clang or GCC are required. Built on WIN10 using `TDM-GCC-64` or `clang 11.0.0`. 
 
 &nbsp; 
 &nbsp; 
