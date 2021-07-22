@@ -18,9 +18,9 @@ static inline Matrix *strassen(Matrix *dest, const Matrix *srcA, const Matrix *s
                            *b11 = matrix_new(len, len), *b12 = matrix_new(len, len), *b21 = matrix_new(len, len), *b22 = matrix_new(len, len), *c11 = matrix_new(len, len), *c12 = matrix_new(len, len), *c21 = matrix_new(len, len), *c22 = matrix_new(len, len), *m1 = matrix_new(len, len), *m2 = matrix_new(len, len), *m3 = matrix_new(len, len), *m4 = matrix_new(len, len), *m5 = matrix_new(len, len), *m6 = matrix_new(len, len), *m7 = matrix_new(len, len), *temp1 = matrix_new(len, len), *temp2 = matrix_new(len, len);
 
     /* Divide matrix into four parts */
-    for (int i = 0; i < len; i++)
+    FOR(i, len)
     {
-        for (int j = 0; j < len; j++)
+        FOR(j, len)
         {
             MXY(a11, i, j) = MXY(srcA, i, j);
             MXY(a12, i, j) = MXY(srcA, i, j + len);
@@ -51,9 +51,9 @@ static inline Matrix *strassen(Matrix *dest, const Matrix *srcA, const Matrix *s
     matrix_addition(c22, matrix_subtraction(temp1, m1, m2), matrix_addition(temp2, m3, m6));
 
     /* Store the answer of matrix multiplication */
-    for (int i = 0; i < len; i++)
+    FOR(i, len)
     {
-        for (int j = 0; j < len; j++)
+        FOR(j, len)
         {
             MXY(dest, i, j) = MXY(c11, i, j);
             MXY(dest, i, j + len) = MXY(c12, i, j);

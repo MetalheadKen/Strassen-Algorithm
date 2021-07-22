@@ -40,10 +40,10 @@ static inline void matrix_free(Matrix **ptr)
 static inline Matrix *matrix_addition(Matrix *res, const Matrix *a, const Matrix *b)
 {
     assert(res && a && b);
-    for (uint32_t i = 0; i < res->rows; i++)
-        for (uint32_t j = 0; j < res->cols; j++)
-            // res->values[i][j] = a->values[i][j] + b->values[i][j];
-            MXY(res, i, j) = MXY(a, i, j) + MXY(b, i, j);
+    FOR(i, res->rows)
+    FOR(j, res->cols)
+    // res->values[i][j] = a->values[i][j] + b->values[i][j];
+    MXY(res, i, j) = MXY(a, i, j) + MXY(b, i, j);
 
     return res;
 }
@@ -51,9 +51,9 @@ static inline Matrix *matrix_addition(Matrix *res, const Matrix *a, const Matrix
 static inline Matrix *matrix_subtraction(Matrix *res, const Matrix *a, const Matrix *b)
 {
     assert(res && a && b);
-    for (uint32_t i = 0; i < res->rows; i++)
-        for (uint32_t j = 0; j < res->cols; j++)
-            MXY(res, i, j) = MXY(a, i, j) - MXY(b, i, j);
+    FOR(i, res->rows)
+    FOR(j, res->cols)
+    MXY(res, i, j) = MXY(a, i, j) - MXY(b, i, j);
 
     return res;
 }
@@ -78,12 +78,12 @@ static inline int matrix_equal(const Matrix *a, const Matrix *b)
 static Matrix *matrix_ijk_matmul(Matrix *C, const Matrix *A, const Matrix *B)
 {
     assert(A && B && C);
-    for (size_t i = 0; i < A->rows; ++i)
+    FOR(i, A->rows)
     {
-        for (size_t j = 0; j < B->cols; ++j)
+        FOR(j, B->cols)
         {
             MXY(C, i, j) = 0;
-            for (size_t k = 0; k < A->cols; ++k)
+            FOR(k, A->cols)
             {
                 MXY(C, i, j) += MXY(A, i, k) * MXY(B, k, j);
             }
@@ -105,9 +105,9 @@ static void matrix_print(const char *prompt, Matrix *mx)
 {
     assert(prompt && mx);
     printf("%s\n", prompt);
-    for (int i = 0; i < mx->rows; i++)
+    FOR(i, mx->rows)
     {
-        for (int j = 0; j < mx->cols; j++)
+        FOR(j, mx->cols)
         {
             printf(" %5d ", MXY(mx, i, j));
         }
@@ -117,9 +117,9 @@ static void matrix_print(const char *prompt, Matrix *mx)
 
 static void inline matrix_foreach(Matrix *mx, Matrix *(*callback)(Matrix *, unsigned, unsigned))
 {
-    for (int i = 0; i < mx->rows; i++)
+    FOR(i, mx->rows)
     {
-        for (int j = 0; j < mx->cols; j++)
+        FOR(j, mx->cols)
         {
             callback(mx, i, j);
         }
