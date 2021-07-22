@@ -90,29 +90,29 @@ static inline Matrix *zoro(Matrix *mx, unsigned i, unsigned j)
 
 int main(int argc, char *argv[])
 {
-    const unsigned matrix_length = SQUARE_MATRIX_SIDE;
+    const unsigned matrix_side_size = SQUARE_MATRIX_SIDE;
 
     /* Check if dimensions of matrix is the power of two or not */
-    if (!ISPOW2(matrix_length))
+    if (!ISPOW2(matrix_side_size))
     {
-        printf("\n%s\tERROR: square matrix side must be a power of 2. And current size:%d is not.", argv[0], matrix_length);
+        printf("\n%s\tERROR: square matrix side must be a power of 2. And current size:%d is not.", argv[0], matrix_side_size);
         return 0;
     }
 
-    matrix_autofree Matrix *matrixA = matrix_new(matrix_length, matrix_length);
-    matrix_autofree Matrix *matrixB = matrix_new(matrix_length, matrix_length);
-    matrix_autofree Matrix *matrixC = matrix_new(matrix_length, matrix_length);
-    matrix_autofree Matrix *matrixR = matrix_new(matrix_length, matrix_length);
+    matrix_autofree Matrix *matrixA = matrix_new(matrix_side_size, matrix_side_size);
+    matrix_autofree Matrix *matrixB = matrix_new(matrix_side_size, matrix_side_size);
+    matrix_autofree Matrix *matrixC = matrix_new(matrix_side_size, matrix_side_size);
+    matrix_autofree Matrix *matrixR = matrix_new(matrix_side_size, matrix_side_size);
 
     matrix_foreach(matrixA, ordinal_as_val);
     matrix_foreach(matrixB, ordinal_as_val);
     matrix_foreach(matrixC, zoro);
     matrix_foreach(matrixR, zoro);
 
-    printf("\n\nMultiplying int[%d][%d] * int[%d][%d]\n\n", SQUARE_MATRIX_SIDE, SQUARE_MATRIX_SIDE, SQUARE_MATRIX_SIDE, SQUARE_MATRIX_SIDE);
+    printf("\n\nMatrix multiplication: C = A * B\nMultiplying int[%d][%d] * int[%d][%d]\n R is the result of ijk_matmul(A,B)\n\n", SQUARE_MATRIX_SIDE, SQUARE_MATRIX_SIDE, SQUARE_MATRIX_SIDE, SQUARE_MATRIX_SIDE);
 
     /* Matrix multiplication */
-    matrixC = strassen(matrixC, matrixA, matrixB, matrix_length);
+    matrixC = strassen(matrixC, matrixA, matrixB, matrix_side_size);
 
     matrixR = matrix_ijk_matmul(matrixR, matrixA, matrixB);
 
