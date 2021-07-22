@@ -4,7 +4,7 @@
 #include <math.h>
 #include "dbj_matrix.h"
 
-#define N 2
+#define SQUARE_MATRIX_SIDE 64
 
 static inline Matrix *strassen(Matrix *dest, const Matrix *srcA, const Matrix *srcB, int length)
 {
@@ -65,31 +65,10 @@ static inline Matrix *strassen(Matrix *dest, const Matrix *srcA, const Matrix *s
     return dest;
 }
 
-static void matrix_print(const char *prompt, Matrix *mx)
-{
-    assert(prompt && mx);
-    printf("%s\n", prompt);
-    for (int i = 0; i < mx->rows; i++)
-    {
-        for (int j = 0; j < mx->cols; j++)
-        {
-            printf(" %5d ", MXY(mx, i, j));
-        }
-        printf("\n");
-    }
-}
-
-static void inline matrix_foreach(Matrix *mx, Matrix *(*callback)(Matrix *, unsigned, unsigned))
-{
-    for (int i = 0; i < mx->rows; i++)
-    {
-        for (int j = 0; j < mx->cols; j++)
-        {
-            callback(mx, i, j);
-        }
-    }
-}
-
+/*
+--------------------------------------------------------------------------------------------------------------------
+callbacks for for_each
+*/
 static inline Matrix *ordinal_as_val(Matrix *mx, unsigned i, unsigned j)
 {
     MXY(mx, i, j) = (i * mx->cols + j);
@@ -108,12 +87,12 @@ static inline Matrix *zoro(Matrix *mx, unsigned i, unsigned j)
 */
 int main(int argc, char *argv[])
 {
-    const unsigned matrix_length = N;
+    const unsigned matrix_length = SQUARE_MATRIX_SIDE;
 
     /* Check if dimensions of matrix is the power of two or not */
     if (ceil(log2(matrix_length)) != floor(log2(matrix_length)))
     {
-        printf("\n%s\tERROR: square matrix side must be a power of 2. And %d is not.", argv[0], matrix_length);
+        printf("\n%s\tERROR: square matrix side must be a power of 2. And current size:%d is not.", argv[0], matrix_length);
         return 0;
     }
 
@@ -127,15 +106,27 @@ int main(int argc, char *argv[])
     matrix_foreach(matrixC, zoro);
     matrix_foreach(matrixR, zoro);
 
+    printf("\n\nMultiplying int[%d][%d] * int[%d][%d]\n\n", SQUARE_MATRIX_SIDE, SQUARE_MATRIX_SIDE, SQUARE_MATRIX_SIDE, SQUARE_MATRIX_SIDE);
+
     /* Matrix multiplication */
     matrixC = strassen(matrixC, matrixA, matrixB, matrix_length);
 
     matrixR = matrix_ijk_matmul(matrixR, matrixA, matrixB);
 
-    matrix_print("Matrix A:", matrixA);
-    matrix_print("Matrix B:", matrixB);
-    matrix_print("Matrix C:", matrixC);
-    matrix_print("Matrix R:", matrixR);
+    if (SQUARE_MATRIX_SIDE < 9)
+    {
+        matrix_print("Matrix A:", matrixA);
+        matrix_print("Matrix B:", matrixB);
+        matrix_print("Matrix C:", matrixC);
+        matrix_print("Matrix R:", matrixR);
+    }
+
+    printf("\n\nC is Strassen result and R is ijk_matmul result. They should be equal. ");
+
+    if (!matrix_equal(matrixC, matrixR))
+        printf("Unfortunately they are not.\n\n");
+    else
+        printf("And indeed they are.\n\n");
 
     return 0;
 }

@@ -101,4 +101,29 @@ static inline Matrix *matrix_new(uint32_t rows, uint32_t cols)
     return matrix;
 }
 
+static void matrix_print(const char *prompt, Matrix *mx)
+{
+    assert(prompt && mx);
+    printf("%s\n", prompt);
+    for (int i = 0; i < mx->rows; i++)
+    {
+        for (int j = 0; j < mx->cols; j++)
+        {
+            printf(" %5d ", MXY(mx, i, j));
+        }
+        printf("\n");
+    }
+}
+
+static void inline matrix_foreach(Matrix *mx, Matrix *(*callback)(Matrix *, unsigned, unsigned))
+{
+    for (int i = 0; i < mx->rows; i++)
+    {
+        for (int j = 0; j < mx->cols; j++)
+        {
+            callback(mx, i, j);
+        }
+    }
+}
+
 #endif /* MATRIX_H_ */

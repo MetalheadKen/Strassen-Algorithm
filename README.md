@@ -1,11 +1,13 @@
-# 100% REFACTORED 
+<h1>100%</h1>
+<h2>&nbsp;</h2>
 
-Unfortunately Strassen as coded here is not working. 
+#### REFACTORED SIMPLE, CORRECT AND WORKING
+
+<h2>&nbsp;</h2>
 
 > Refactoring (c) 2021 by dbj@dbj.org -- https://dbj.org/license_dbj 
 
-
----
+<h2>&nbsp;</h2>
 
 Original README
 
