@@ -2,7 +2,7 @@
 
 Unfortunately Strassen as coded here is not working. 
 
-> Refactoring (c) 20201 by dbj@dbj.org -- https://dbj.org/license_dbj 
+> Refactoring (c) 2021 by dbj@dbj.org -- https://dbj.org/license_dbj 
 
 
 ---
