@@ -1,91 +1,106 @@
 
-    #include <stdio.h>
-    #include <stdlib.h>
-    #include <math.h>
-    #include "Matrix.c"
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include "dbj_matrix.h"
 
-#define N 64
+#define N 2
 
-static inline Matrix * strassen(Matrix * dest, const Matrix * srcA, const Matrix * srcB, int length)
+static inline Matrix *strassen(Matrix *dest, const Matrix *srcA, const Matrix *srcB, int length)
 {
- 
-    if (length == 2) return Matrix_Multiply(dest, srcA, srcB);
+
+    if (length == 2)
+        return matrix_ijk_matmul(dest, srcA, srcB);
 
     int len = length / 2;
 
-     matrix_autofree Matrix  *  a11= Matrix_Initializer( len, len),  * a12= Matrix_Initializer( len, len),  * a21= Matrix_Initializer( len, len),  * a22= Matrix_Initializer( len, len),  
-     * b11= Matrix_Initializer( len, len),  * b12= Matrix_Initializer( len, len),  * b21= Matrix_Initializer( len, len),  * b22= Matrix_Initializer( len, len),  * c11= Matrix_Initializer( len, len),  * c12= Matrix_Initializer( len, len),  * c21= Matrix_Initializer( len, len),  * c22= Matrix_Initializer( len, len),  *              
-                    m1= Matrix_Initializer( len, len),  * m2= Matrix_Initializer( len, len),  * m3= Matrix_Initializer( len, len),  * m4= Matrix_Initializer( len, len),  * m5= Matrix_Initializer( len, len),  * m6= Matrix_Initializer( len, len),  * m7= Matrix_Initializer( len, len),  * temp1= Matrix_Initializer( len, len),  * temp2 = Matrix_Initializer( len, len) ;
+    matrix_autofree Matrix *a11 = matrix_new(len, len), *a12 = matrix_new(len, len), *a21 = matrix_new(len, len), *a22 = matrix_new(len, len),
+                           *b11 = matrix_new(len, len), *b12 = matrix_new(len, len), *b21 = matrix_new(len, len), *b22 = matrix_new(len, len), *c11 = matrix_new(len, len), *c12 = matrix_new(len, len), *c21 = matrix_new(len, len), *c22 = matrix_new(len, len), *m1 = matrix_new(len, len), *m2 = matrix_new(len, len), *m3 = matrix_new(len, len), *m4 = matrix_new(len, len), *m5 = matrix_new(len, len), *m6 = matrix_new(len, len), *m7 = matrix_new(len, len), *temp1 = matrix_new(len, len), *temp2 = matrix_new(len, len);
 
     /* Divide matrix into four parts */
-    for (int i = 0; i < len; i++) {
-        for (int j = 0; j < len; j++) {
-            a11->values[i][j] = srcA->values[i][j];
-            a12->values[i][j] = srcA->values[i][j + len];
-            a21->values[i][j] = srcA->values[i + len][j];
-            a22->values[i][j] = srcA->values[i + len][j + len];
-            
-            b11->values[i][j] = srcB->values[i][j];
-            b12->values[i][j] = srcB->values[i][j + len];
-            b21->values[i][j] = srcB->values[i + len][j];
-            b22->values[i][j] = srcB->values[i + len][j + len];
+    for (int i = 0; i < len; i++)
+    {
+        for (int j = 0; j < len; j++)
+        {
+            MXY(a11, i, j) = MXY(srcA, i, j);
+            MXY(a12, i, j) = MXY(srcA, i, j + len);
+            MXY(a21, i, j) = MXY(srcA, i + len, j);
+            MXY(a22, i, j) = MXY(srcA, i + len, j + len);
+
+            MXY(b11, i, j) = MXY(srcB, i, j);
+            MXY(b12, i, j) = MXY(srcB, i, j + len);
+            MXY(b21, i, j) = MXY(srcB, i + len, j);
+            MXY(b22, i, j) = MXY(srcB, i + len, j + len);
         }
     }
 
     /* Calculate seven formulas of strassen Algorithm */
-    strassen(m1, Matrix_Addition(temp1, a11, a22), Matrix_Addition(temp2, b11, b22), len);
-    strassen(m2, Matrix_Addition(temp1, a21, a22), b11, len);
-    strassen(m3, a11, Matrix_Subtract(temp1, b12, b22), len);
-    strassen(m4, a22, Matrix_Subtract(temp1, b21, b11), len);
-    strassen(m5, Matrix_Addition(temp1, a11, a12), b22, len);
-    strassen(m6, Matrix_Subtract(temp1, a21, a11), Matrix_Addition(temp2, b11, b12), len);
-    strassen(m7, Matrix_Subtract(temp1, a12, a22), Matrix_Addition(temp2, b21, b22), len);
+    strassen(m1, matrix_addition(temp1, a11, a22), matrix_addition(temp2, b11, b22), len);
+    strassen(m2, matrix_addition(temp1, a21, a22), b11, len);
+    strassen(m3, a11, matrix_subtraction(temp1, b12, b22), len);
+    strassen(m4, a22, matrix_subtraction(temp1, b21, b11), len);
+    strassen(m5, matrix_addition(temp1, a11, a12), b22, len);
+    strassen(m6, matrix_subtraction(temp1, a21, a11), matrix_addition(temp2, b11, b12), len);
+    strassen(m7, matrix_subtraction(temp1, a12, a22), matrix_addition(temp2, b21, b22), len);
 
     /* Merge the answer of matrix dest */
     /* c11 = m1 + m4 - m5 + m7 = m1 + m4 - (m5 - m7) */
-    Matrix_Subtract(c11, Matrix_Addition(temp1, m1, m4), Matrix_Subtract(temp2, m5, m7));
-    Matrix_Addition(c12, m3, m5);
-    Matrix_Addition(c21, m2, m4);
-    Matrix_Addition(c22, Matrix_Subtract(temp1, m1, m2), Matrix_Addition(temp2, m3, m6));
-    
+    matrix_subtraction(c11, matrix_addition(temp1, m1, m4), matrix_subtraction(temp2, m5, m7));
+    matrix_addition(c12, m3, m5);
+    matrix_addition(c21, m2, m4);
+    matrix_addition(c22, matrix_subtraction(temp1, m1, m2), matrix_addition(temp2, m3, m6));
+
     /* Store the answer of matrix multiplication */
-    for (int i = 0; i < len; i++) {
-        for (int j = 0; j < len; j++) {
-            dest->values[i][j]              = c11->values[i][j];
-            dest->values[i][j + len]        = c12->values[i][j];
-            dest->values[i + len][j]        = c21->values[i][j];
-            dest->values[i + len][j + len]  = c22->values[i][j];
+    for (int i = 0; i < len; i++)
+    {
+        for (int j = 0; j < len; j++)
+        {
+            MXY(dest, i, j) = MXY(c11, i, j);
+            MXY(dest, i, j + len) = MXY(c12, i, j);
+            MXY(dest, i + len, j) = MXY(c21, i, j);
+            MXY(dest, i + len, j + len) = MXY(c22, i, j);
         }
     }
 
     return dest;
 }
 
-static void matrix_print ( const char * prompt, Matrix * mx ) 
+static void matrix_print(const char *prompt, Matrix *mx)
 {
-    assert( prompt && mx );
-    printf("%s\n", prompt );
-    for(int i = 0; i < mx->row  ; i++) {
-        for (int j = 0; j < mx->column; j++) {
-            printf(" %5d ", mx->values[i][j]);
+    assert(prompt && mx);
+    printf("%s\n", prompt);
+    for (int i = 0; i < mx->rows; i++)
+    {
+        for (int j = 0; j < mx->cols; j++)
+        {
+            printf(" %5d ", MXY(mx, i, j));
         }
         printf("\n");
     }
 }
 
-static void matrix_foreach ( Matrix * mx, Matrix * (*callback)(Matrix *, unsigned, unsigned) ) 
+static void inline matrix_foreach(Matrix *mx, Matrix *(*callback)(Matrix *, unsigned, unsigned))
 {
-    for(int i = 0; i < mx->row  ; i++) {
-        for (int j = 0; j < mx->column; j++) {
-            callback(mx,i,j);
+    for (int i = 0; i < mx->rows; i++)
+    {
+        for (int j = 0; j < mx->cols; j++)
+        {
+            callback(mx, i, j);
         }
     }
 }
 
-Matrix * ordinal_as_val (Matrix * mx, unsigned i, unsigned j) 
+static inline Matrix *ordinal_as_val(Matrix *mx, unsigned i, unsigned j)
 {
-    mx->values[i][j] = (i * mx->column + j) ;
-    return mx ;
+    MXY(mx, i, j) = (i * mx->cols + j);
+    return mx;
+}
+
+static inline Matrix *zoro(Matrix *mx, unsigned i, unsigned j)
+{
+    assert(mx && mx->values);
+    MXY(mx, i, j) = 0;
+    return mx;
 }
 
 /*
@@ -93,28 +108,34 @@ Matrix * ordinal_as_val (Matrix * mx, unsigned i, unsigned j)
 */
 int main(int argc, char *argv[])
 {
-    const unsigned matrix_length = N ;
-  
+    const unsigned matrix_length = N;
+
     /* Check if dimensions of matrix is the power of two or not */
     if (ceil(log2(matrix_length)) != floor(log2(matrix_length)))
     {
-        printf("\nERROR: square matrix side must be a power of 2. And %d is not.",matrix_length );
+        printf("\n%s\tERROR: square matrix side must be a power of 2. And %d is not.", argv[0], matrix_length);
         return 0;
     }
 
-    matrix_autofree Matrix * matrixA = Matrix_Initializer( matrix_length, matrix_length);
-    matrix_autofree Matrix * matrixB = Matrix_Initializer( matrix_length, matrix_length);
-    matrix_autofree Matrix * matrixC = Matrix_Initializer( matrix_length, matrix_length);
-    
-    matrix_foreach(matrixA, ordinal_as_val );
-    matrix_foreach(matrixB, ordinal_as_val );
+    matrix_autofree Matrix *matrixA = matrix_new(matrix_length, matrix_length);
+    matrix_autofree Matrix *matrixB = matrix_new(matrix_length, matrix_length);
+    matrix_autofree Matrix *matrixC = matrix_new(matrix_length, matrix_length);
+    matrix_autofree Matrix *matrixR = matrix_new(matrix_length, matrix_length);
+
+    matrix_foreach(matrixA, ordinal_as_val);
+    matrix_foreach(matrixB, ordinal_as_val);
+    matrix_foreach(matrixC, zoro);
+    matrix_foreach(matrixR, zoro);
 
     /* Matrix multiplication */
     matrixC = strassen(matrixC, matrixA, matrixB, matrix_length);
 
-matrix_print("Matrix A:", matrixA );
-matrix_print("Matrix B:", matrixB );
-matrix_print("Matrix C:", matrixC );
+    matrixR = matrix_ijk_matmul(matrixR, matrixA, matrixB);
+
+    matrix_print("Matrix A:", matrixA);
+    matrix_print("Matrix B:", matrixB);
+    matrix_print("Matrix C:", matrixC);
+    matrix_print("Matrix R:", matrixR);
 
     return 0;
 }
