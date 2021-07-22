@@ -1,20 +1,17 @@
 <h1>100%</h1>
 
-#### REFACTORED SIMPLE, CORRECT AND WORKING
+#### REFACTORED, SIMPLE, CORRECT AND WORKING
 
-&nbsp; 
-&nbsp; 
 > Refactoring (c) 2021 by dbj@dbj.org -- https://dbj.org/license_dbj 
+
+Built on WIN10 using `TDM-GCC-64`. Clang or GCC are required.
+
 &nbsp; 
 &nbsp; 
 
 Original README
-&nbsp; 
-&nbsp; 
 
 ### Strassen Algorithm
-&nbsp; 
-&nbsp; 
 
 Implementation of the Strassen Algorithm in C
 
