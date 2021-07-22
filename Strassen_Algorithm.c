@@ -4,7 +4,11 @@
 #include <math.h>
 #include "dbj_matrix.h"
 
-#define SQUARE_MATRIX_SIDE 64
+#define MATRIX_ROWS 2
+#define MATRIX_COLS 4
+
+/* Check if value is the power of two or not */
+#define ISPOW2(V_) (ceil(log2(V_)) == floor(log2(V_)))
 
 static inline Matrix *strassen(Matrix *dest, const Matrix *srcA, const Matrix *srcB, int length)
 {
@@ -84,52 +88,103 @@ static inline Matrix *zoro(Matrix *mx, unsigned i, unsigned j)
 
 /*
 --------------------------------------------------------------------------------------------------------------------
+nano app framework so that it is maleable to using it with UBENCH.H
 */
-/* Check if value is the power of two or not */
-#define ISPOW2(V_) (ceil(log2(V_)) == floor(log2(V_)))
+typedef struct APP_DATA APP_DATA;
+void app_start(const int, const char *const[]);
+void app_end();
 
-int main(int argc, char *argv[])
+/*
+--------------------------------------------------------------------------------------------------------------------
+nano app framework so that it is maleable to using it with UBENCH.H
+*/
+
+static struct APP_DATA
 {
-    const unsigned matrix_side_size = SQUARE_MATRIX_SIDE;
+    Matrix *matrixA;
+    Matrix *matrixB;
+    Matrix *matrixC;
+    Matrix *matrixR;
+} *app_data = 0;
 
-    /* Check if dimensions of matrix is the power of two or not */
-    if (!ISPOW2(matrix_side_size))
+void app_start(const int argc, const char *const argv[])
+{
+    /* Check if dimensions of matrix are the power of two */
+    if (!ISPOW2(MATRIX_ROWS))
     {
-        printf("\n%s\tERROR: square matrix side must be a power of 2. And current size:%d is not.", argv[0], matrix_side_size);
-        return 0;
+        printf("\n%s\tERROR: square matrix side must be a power of 2. And current rows num:%d is not.", argv[0], MATRIX_ROWS);
+        exit(EXIT_FAILURE);
     }
 
-    matrix_autofree Matrix *matrixA = matrix_new(matrix_side_size, matrix_side_size);
-    matrix_autofree Matrix *matrixB = matrix_new(matrix_side_size, matrix_side_size);
-    matrix_autofree Matrix *matrixC = matrix_new(matrix_side_size, matrix_side_size);
-    matrix_autofree Matrix *matrixR = matrix_new(matrix_side_size, matrix_side_size);
-
-    matrix_foreach(matrixA, ordinal_as_val);
-    matrix_foreach(matrixB, ordinal_as_val);
-    matrix_foreach(matrixC, zoro);
-    matrix_foreach(matrixR, zoro);
-
-    printf("\n\nMatrix multiplication: C = A * B\nMultiplying int[%d][%d] * int[%d][%d]\n R is the result of ijk_matmul(A,B)\n\n", SQUARE_MATRIX_SIDE, SQUARE_MATRIX_SIDE, SQUARE_MATRIX_SIDE, SQUARE_MATRIX_SIDE);
-
-    /* Matrix multiplication */
-    matrixC = strassen(matrixC, matrixA, matrixB, matrix_side_size);
-
-    matrixR = matrix_ijk_matmul(matrixR, matrixA, matrixB);
-
-    if (SQUARE_MATRIX_SIDE < 9)
+    if (!ISPOW2(MATRIX_COLS))
     {
-        matrix_print("Matrix A:", matrixA);
-        matrix_print("Matrix B:", matrixB);
-        matrix_print("Matrix C:", matrixC);
-        matrix_print("Matrix R:", matrixR);
+        printf("\n%s\tERROR: square matrix side must be a power of 2. And current cols num:%d is not.", argv[0], MATRIX_COLS);
+        exit(EXIT_FAILURE);
+    }
+
+    app_data = calloc(1, sizeof(APP_DATA));
+    assert(app_data);
+    app_data->matrixA = matrix_new(MATRIX_ROWS, MATRIX_COLS);
+    app_data->matrixB = matrix_new(MATRIX_ROWS, MATRIX_COLS);
+    app_data->matrixC = matrix_new(MATRIX_ROWS, MATRIX_COLS);
+    app_data->matrixR = matrix_new(MATRIX_ROWS, MATRIX_COLS);
+
+    matrix_foreach(app_data->matrixA, ordinal_as_val);
+    matrix_foreach(app_data->matrixB, ordinal_as_val);
+    matrix_foreach(app_data->matrixC, zoro);
+    matrix_foreach(app_data->matrixR, zoro);
+}
+void app_end()
+{
+
+    printf("\n\nMatrix multiplication\n\nC = strassen(A, B)\nR = ijk_matmul(A,B)\n\n");
+    if (MATRIX_ROWS < 9)
+    {
+        printf("\n\nAfter multiplications:\n");
+        matrix_print("Matrix A:", app_data->matrixA);
+        matrix_print("Matrix B:", app_data->matrixB);
+        matrix_print("Matrix C:", app_data->matrixC);
+        matrix_print("Matrix R:", app_data->matrixR);
     }
 
     printf("\n\nC is Strassen result and R is ijk_matmul result. They should be equal. ");
 
-    if (!matrix_equal(matrixC, matrixR))
+    if (!matrix_equal(app_data->matrixC, app_data->matrixR))
         printf("Unfortunately they are not.\n\n");
     else
         printf("And indeed they are.\n\n");
 
+    matrix_free(&app_data->matrixA);
+    matrix_free(&app_data->matrixB);
+    matrix_free(&app_data->matrixC);
+    matrix_free(&app_data->matrixR);
+
+    free(app_data);
+    app_data = 0;
+}
+/*
+--------------------------------------------------------------------------------------------------------------------
+*/
+static void do_strassen()
+{
+    /* Matrix multiplication */
+    app_data->matrixC = strassen(app_data->matrixC, app_data->matrixA, app_data->matrixB, MATRIX_ROWS);
+}
+
+static void do_ijk()
+{
+    app_data->matrixR = matrix_ijk_matmul(app_data->matrixR, app_data->matrixA, app_data->matrixB);
+}
+
+/*
+--------------------------------------------------------------------------------------------------------------------
+*/
+
+int main(int argc, const char *const argv[])
+{
+    app_start(argc, argv);
+    do_strassen();
+    do_ijk();
+    app_end();
     return 0;
 }
