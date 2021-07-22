@@ -112,13 +112,17 @@ void app_start(const int argc, const char *const argv[])
     /* Check if dimensions of matrix are the power of two */
     if (!ISPOW2(MATRIX_ROWS))
     {
-        printf("\n%s\tERROR: square matrix side must be a power of 2. And current rows num:%d is not.", argv[0], MATRIX_ROWS);
+        printf("\n%s\tERROR: Each matrix side must be a power of 2. "
+               "And current rows num:%d is not.",
+               argv[0], MATRIX_ROWS);
         exit(EXIT_FAILURE);
     }
 
     if (!ISPOW2(MATRIX_COLS))
     {
-        printf("\n%s\tERROR: square matrix side must be a power of 2. And current cols num:%d is not.", argv[0], MATRIX_COLS);
+        printf("\n%s\tERROR: Each matrix side must be a power of 2. "
+               "And current cols num:%d is not.",
+               argv[0], MATRIX_COLS);
         exit(EXIT_FAILURE);
     }
 
