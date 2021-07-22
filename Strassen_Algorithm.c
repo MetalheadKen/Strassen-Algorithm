@@ -67,7 +67,7 @@ static inline Matrix *strassen(Matrix *dest, const Matrix *srcA, const Matrix *s
 
 /*
 --------------------------------------------------------------------------------------------------------------------
-callbacks for for_each
+callbacks for matrix_for_each
 */
 static inline Matrix *ordinal_as_val(Matrix *mx, unsigned i, unsigned j)
 {
@@ -85,12 +85,15 @@ static inline Matrix *zoro(Matrix *mx, unsigned i, unsigned j)
 /*
 --------------------------------------------------------------------------------------------------------------------
 */
+/* Check if value is the power of two or not */
+#define ISPOW2(V_) (ceil(log2(V_)) == floor(log2(V_)))
+
 int main(int argc, char *argv[])
 {
     const unsigned matrix_length = SQUARE_MATRIX_SIDE;
 
     /* Check if dimensions of matrix is the power of two or not */
-    if (ceil(log2(matrix_length)) != floor(log2(matrix_length)))
+    if (!ISPOW2(matrix_length))
     {
         printf("\n%s\tERROR: square matrix side must be a power of 2. And current size:%d is not.", argv[0], matrix_length);
         return 0;
