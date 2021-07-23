@@ -96,7 +96,6 @@ void app_end();
 
 /*
 --------------------------------------------------------------------------------------------------------------------
-nano app framework so that it is maleable to using it with UBENCH.H
 */
 
 static struct APP_DATA
