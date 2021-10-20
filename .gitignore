@@ -1,3 +1,9 @@
+# DBJ
+*.ilk
+*.pdb
+.vs
+.vscode
+
 # Object files
 *.o
 *.ko
